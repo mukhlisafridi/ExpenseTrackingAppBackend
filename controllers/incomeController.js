@@ -6,12 +6,10 @@ export const addIncome=async(req,res)=>{
   try {
     const { icon, source, amount, date } = req.body;
 
-    // Validation: Check for required fields
     if (!source || !amount || !date) {
       return res.status(400).json({ message: "fileds are required" });
     }
 
-    // Create new Income document
     const newIncome = new Income({
       userId,
       icon: icon || "",
@@ -20,7 +18,6 @@ export const addIncome=async(req,res)=>{
       date: date ? new Date(date) : new Date(),
     });
 
-    // Save to database
     await newIncome.save();
 
     res.status(200).json(newIncome);
@@ -31,13 +28,6 @@ export const addIncome=async(req,res)=>{
 };
 
 
-
-
-
-
-
-
- 
 export const getAllIncome = async (req, res) => {
   const userId = req.user.id;
 
@@ -68,7 +58,6 @@ export const downloadInExcel = async (req, res) => {
   try {
     const income = await Income.find({ userId }).sort({ date: -1 });
 
-    // Prepare data for Excel
     const data = income.map((item) => ({
       Source: item.source,
       Amount: item.amount,
@@ -79,7 +68,6 @@ export const downloadInExcel = async (req, res) => {
     const ws = xlsx.utils.json_to_sheet(data);
     xlsx.utils.book_append_sheet(wb, ws, "Income");
 
-    // Send as buffer instead of writing file
     const buffer = xlsx.write(wb, { type: 'buffer', bookType: 'xlsx' });
 
     res.setHeader(

@@ -5,7 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
 
-// Load environment variables
+
 dotenv.config();
 
 const app = express();
@@ -17,9 +17,10 @@ const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend
+    origin: "http://localhost:5173", 
     credentials: true,
   })
 );
@@ -27,13 +28,12 @@ app.use(
 // Static folder for uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✅ Routes Import
+// Routes 
 import userRoutes from "./routes/user.route.js";
 import incomeRoute from "./routes/incomeRoute.js";
 import expenseRoute from "./routes/expenseRoute.js";
 import dashboardRoute from "./routes/dashboardRoute.js";
 
-//  Route Mounting (with prefix for consistency)
 app.use("/api/v1", userRoutes);
 app.use("/api/v1/income", incomeRoute);
 app.use("/api/v1/expense", expenseRoute);

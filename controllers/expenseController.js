@@ -27,7 +27,7 @@ export const addExpense = async (req, res) => {
   }
 };
 
-// Get all expenses of logged-in user
+// Get all expenses of  user
 export const getAllExpense = async (req, res) => {
   const userId = req.user.id;
   try {
@@ -53,7 +53,7 @@ export const deleteExpense = async (req, res) => {
   }
 };
 
-// Download expenses as Excel
+// Download expense in Excel
 export const downloadExpenseExcel = async (req, res) => {
   const userId = req.user.id;
   try {

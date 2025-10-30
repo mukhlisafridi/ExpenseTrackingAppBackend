@@ -2,33 +2,27 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// User Signup Controller
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // 1 Validate fields
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // 2 Check existing user
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    // 3 Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 4 Handle profile image
     let profileUrl = "";
     if (req.file) {
-      profileUrl = req.file.path; // Cloudinary se URL mil jayega
+      profileUrl = req.file.path;
     }
 
-    // 5 Create new user
     const newUser = await User.create({
       name,
       email,
@@ -36,7 +30,6 @@ export const registerUser = async (req, res) => {
       profile: profileUrl,
     });
 
-    // 6 Return success response
     res.status(201).json({
       message: "User registered successfully",
       user: {
@@ -48,47 +41,38 @@ export const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Signup Error:", error.message);
-    
-    // Cloudinary specific error handling
+
     if (error.message.includes("File too large")) {
       return res.status(400).json({ message: "Image size should be less than 5MB" });
     }
     if (error.message.includes("image formats")) {
       return res.status(400).json({ message: "Only JPG, JPEG, PNG images are allowed" });
     }
-    
+
     res.status(500).json({ message: "Server error, please try again later" });
   }
 };
 
-// User Login Controller (same as before)
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1. Validate fields
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // 2. Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // 3. Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // 4. Create JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    // 5. Return success response
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -109,9 +93,7 @@ export const getUserInfo = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
-      return res
-        .status(404)
-        .json({ message: "User Not Found", success: false });
+      return res.status(404).json({ message: "User Not Found", success: false });
     }
     return res.status(200).json(user);
   } catch (error) {

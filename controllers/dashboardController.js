@@ -9,13 +9,13 @@ export const getDashboardData = async (req, res) => {
 
     const userObjectId = new Types.ObjectId(String(userId));
 
-    // Aggregate total income
+    //  total income
     const totalIncomeAgg = await Income.aggregate([
       { $match: { userId: userObjectId } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
     ]);
 
-    // Aggregate total expense
+    //  total expense
     const totalExpenseAgg = await Expense.aggregate([
       { $match: { userId: userObjectId } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
@@ -48,7 +48,7 @@ export const getDashboardData = async (req, res) => {
       0
     );
 
-    // Recent transactions: merge last 5 incomes and last 5 expenses, sort by date desc, take 5
+  
     const recentIncomes = (await Income.find({ userId: userObjectId }).sort({ date: -1 }).limit(5).lean())
       .map((txn) => ({ ...txn, type: 'income' }));
     const recentExpenses = (await Expense.find({ userId: userObjectId }).sort({ date: -1 }).limit(5).lean())
@@ -58,7 +58,7 @@ export const getDashboardData = async (req, res) => {
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 5);
 
-    // Final response
+    
     return res.json({
       totalBalance: totalIncome - totalExpense,
       totalIncome,
