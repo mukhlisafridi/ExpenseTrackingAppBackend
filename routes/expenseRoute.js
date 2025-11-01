@@ -8,6 +8,4 @@ router.get("/get-expense",protect,getAllExpense)
 router.get("/download-excel",protect,downloadExpenseExcel)
 router.delete("/delete-expense/:id",protect,deleteExpense)
 
-
-
 export default router
